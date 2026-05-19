@@ -162,10 +162,15 @@ internal static partial class HextechRuneSelectionCoordinator
 			if (finalMonsterHex.HasValue)
 			{
 				modifier.SetMonsterHexForAct(actIndex, finalMonsterHex.Value);
+				MonsterHexKind secondHex = RunManager.Instance.NetService.Type is NetGameType.Host or NetGameType.Client
+					? ChooseStableSecondMonsterHexForAct(modifier, rarity, runState, actIndex)
+					: ChooseSecondMonsterHexForAct(modifier, rarity, runState);
+				modifier.SetSecondMonsterHexForAct(actIndex, secondHex);
 			}
 			else
 			{
 				modifier.ClearMonsterHexForAct(actIndex);
+				modifier.ClearSecondMonsterHexForAct(actIndex);
 			}
 			modifier.SetActResolved(actIndex, true);
 			HextechEnemyUi.Refresh(modifier);

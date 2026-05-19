@@ -68,6 +68,10 @@ internal static partial class HextechRuneSelectionCoordinator
 			?? (isMultiplayer ? ChooseStableMonsterHexForAct(modifier, localRarity, runState, actIndex) : ChooseMonsterHexForAct(modifier, localRarity, runState));
 		modifier.SetMonsterHexForAct(actIndex, localMonsterHex);
 
+		MonsterHexKind secondMonsterHex = modifier.GetSecondMonsterHexForAct(actIndex)
+			?? (isMultiplayer ? ChooseStableSecondMonsterHexForAct(modifier, localRarity, runState, actIndex) : ChooseSecondMonsterHexForAct(modifier, localRarity, runState));
+		modifier.SetSecondMonsterHexForAct(actIndex, secondMonsterHex);
+
 		if (gameType is NetGameType.Singleplayer or NetGameType.None or NetGameType.Replay)
 		{
 			return (localRarity, localMonsterHex);
@@ -187,6 +191,33 @@ internal static partial class HextechRuneSelectionCoordinator
 			runState,
 			pool.Count,
 			"act-roll-monster-hex",
+			actIndex.ToString(),
+			((int)rarity).ToString(),
+			string.Join(",", pool.Select(static kind => ((int)kind).ToString()).OrderBy(static key => key, StringComparer.Ordinal)))];
+	}
+
+	private static MonsterHexKind ChooseSecondMonsterHexForAct(HextechMayhemModifier modifier, HextechRarityTier rarity, RunState runState)
+	{
+		HashSet<MonsterHexKind> alreadyChosen = modifier.GetKnownMonsterHexes().ToHashSet();
+
+		List<MonsterHexKind> pool = MonsterHexCatalog.GetMonsterHexesForRarity(rarity)
+			.Where(kind => !alreadyChosen.Contains(kind))
+			.ToList();
+		if (pool.Count == 0)
+		{
+			pool = MonsterHexCatalog.GetMonsterHexesForRarity(rarity).ToList();
+		}
+
+		return pool[runState.Rng.Niche.NextInt(pool.Count)];
+	}
+
+	private static MonsterHexKind ChooseStableSecondMonsterHexForAct(HextechMayhemModifier modifier, HextechRarityTier rarity, RunState runState, int actIndex)
+	{
+		List<MonsterHexKind> pool = BuildMonsterHexPoolForAct(modifier, rarity);
+		return pool[HextechStableRandom.Index(
+			runState,
+			pool.Count,
+			"act-roll-monster-hex-2",
 			actIndex.ToString(),
 			((int)rarity).ToString(),
 			string.Join(",", pool.Select(static kind => ((int)kind).ToString()).OrderBy(static key => key, StringComparer.Ordinal)))];

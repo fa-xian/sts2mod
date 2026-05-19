@@ -47,6 +47,17 @@ internal sealed partial class HextechMayhemModifier
 	}
 
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+	public int[] SavedMonsterHexByAct2
+	{
+		get => _actState.SavedMonsterHexByAct2;
+		set
+		{
+			_actState.SavedMonsterHexByAct2 = value;
+			InvalidateActiveMonsterHexCache();
+		}
+	}
+
+	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
 	public int[] SavedCarriedMonsterHexes
 	{
 		get => _actState.SavedCarriedMonsterHexes;
@@ -185,6 +196,23 @@ internal sealed partial class HextechMayhemModifier
 	public void ClearMonsterHexForAct(int actIndex)
 	{
 		_actState.ClearMonsterHex(actIndex);
+		InvalidateActiveMonsterHexCache();
+	}
+
+	public MonsterHexKind? GetSecondMonsterHexForAct(int actIndex)
+	{
+		return _actState.GetSecondMonsterHex(actIndex);
+	}
+
+	public void SetSecondMonsterHexForAct(int actIndex, MonsterHexKind hex)
+	{
+		_actState.SetSecondMonsterHex(actIndex, hex);
+		InvalidateActiveMonsterHexCache();
+	}
+
+	public void ClearSecondMonsterHexForAct(int actIndex)
+	{
+		_actState.ClearSecondMonsterHex(actIndex);
 		InvalidateActiveMonsterHexCache();
 	}
 

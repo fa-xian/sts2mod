@@ -53,7 +53,8 @@ internal static class HextechTelemetry
 	private sealed record MonsterHexTelemetry(
 		int ActIndex,
 		string Rarity,
-		string Hex);
+		string Hex,
+		string? Hex2 = null);
 
 	private const string DefaultEndpoint = "http://39.96.216.77/api/hextech-runes/run-result";
 	private const string ConfigFileName = "telemetry_config.json";
@@ -190,7 +191,8 @@ internal static class HextechTelemetry
 				HextechRarityTier? rarity = modifier.GetRarityForAct(actIndex);
 				if (hex.HasValue && rarity.HasValue)
 				{
-					monsterHexes.Add(new MonsterHexTelemetry(actIndex, rarity.Value.ToString(), hex.Value.ToString()));
+					MonsterHexKind? hex2 = modifier.GetSecondMonsterHexForAct(actIndex);
+					monsterHexes.Add(new MonsterHexTelemetry(actIndex, rarity.Value.ToString(), hex.Value.ToString(), hex2?.ToString()));
 				}
 			}
 		}

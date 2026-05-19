@@ -4,6 +4,7 @@ internal sealed class HextechMayhemActState
 {
 	private int[] _rarityByAct = NewUnknownArray();
 	private int[] _monsterHexByAct = NewUnknownArray();
+	private int[] _monsterHexByAct2 = NewUnknownArray();
 	private int[] _resolvedActs = NewResolvedArray();
 	private List<MonsterHexKind> _carriedMonsterHexes = new();
 
@@ -19,6 +20,12 @@ internal sealed class HextechMayhemActState
 	{
 		get => _monsterHexByAct;
 		set => _monsterHexByAct = NormalizeUnknownArray(value);
+	}
+
+	public int[] SavedMonsterHexByAct2
+	{
+		get => _monsterHexByAct2;
+		set => _monsterHexByAct2 = NormalizeUnknownArray(value);
 	}
 
 	public int[] SavedCarriedMonsterHexes
@@ -112,6 +119,32 @@ internal sealed class HextechMayhemActState
 		}
 	}
 
+	public MonsterHexKind? GetSecondMonsterHex(int actIndex)
+	{
+		if (actIndex < 0 || actIndex >= _monsterHexByAct2.Length || _monsterHexByAct2[actIndex] < 0)
+		{
+			return null;
+		}
+
+		return (MonsterHexKind)_monsterHexByAct2[actIndex];
+	}
+
+	public void SetSecondMonsterHex(int actIndex, MonsterHexKind hex)
+	{
+		if (actIndex >= 0 && actIndex < _monsterHexByAct2.Length)
+		{
+			_monsterHexByAct2[actIndex] = (int)hex;
+		}
+	}
+
+	public void ClearSecondMonsterHex(int actIndex)
+	{
+		if (actIndex >= 0 && actIndex < _monsterHexByAct2.Length)
+		{
+			_monsterHexByAct2[actIndex] = -1;
+		}
+	}
+
 	public IReadOnlyList<MonsterHexKind> GetActiveMonsterHexes(int currentActIndex, Func<int, bool> shouldRecoverMonsterHex)
 	{
 		List<MonsterHexKind> result = new();
@@ -130,6 +163,16 @@ internal sealed class HextechMayhemActState
 				&& (IsResolved(actIndex) || shouldRecoverMonsterHex(actIndex)))
 			{
 				MonsterHexKind hex = (MonsterHexKind)_monsterHexByAct[actIndex];
+				if (seen.Add(hex))
+				{
+					result.Add(hex);
+				}
+			}
+
+			if (_monsterHexByAct2[actIndex] >= 0
+				&& (IsResolved(actIndex) || shouldRecoverMonsterHex(actIndex)))
+			{
+				MonsterHexKind hex = (MonsterHexKind)_monsterHexByAct2[actIndex];
 				if (seen.Add(hex))
 				{
 					result.Add(hex);
@@ -164,6 +207,18 @@ internal sealed class HextechMayhemActState
 			}
 		}
 
+		foreach (int rawHex in _monsterHexByAct2)
+		{
+			if (rawHex >= 0 && Enum.IsDefined(typeof(MonsterHexKind), rawHex))
+			{
+				MonsterHexKind hex = (MonsterHexKind)rawHex;
+				if (seen.Add(hex))
+				{
+					result.Add(hex);
+				}
+			}
+		}
+
 		return result;
 	}
 
@@ -176,6 +231,7 @@ internal sealed class HextechMayhemActState
 	{
 		_rarityByAct = NewUnknownArray();
 		_monsterHexByAct = NewUnknownArray();
+		_monsterHexByAct2 = NewUnknownArray();
 		_resolvedActs = NewResolvedArray();
 		_carriedMonsterHexes.Clear();
 	}
@@ -185,6 +241,7 @@ internal sealed class HextechMayhemActState
 		CarryResolvedMonsterHexes();
 		_rarityByAct = NewUnknownArray();
 		_monsterHexByAct = NewUnknownArray();
+		_monsterHexByAct2 = NewUnknownArray();
 		_resolvedActs = NewResolvedArray();
 	}
 
@@ -201,7 +258,7 @@ internal sealed class HextechMayhemActState
 
 	public string Describe()
 	{
-		return $"resolved={string.Join(",", _resolvedActs)} rarity={string.Join(",", _rarityByAct)} monster={string.Join(",", _monsterHexByAct)} carried={string.Join(",", _carriedMonsterHexes)}";
+		return $"resolved={string.Join(",", _resolvedActs)} rarity={string.Join(",", _rarityByAct)} monster={string.Join(",", _monsterHexByAct)} monster2={string.Join(",", _monsterHexByAct2)} carried={string.Join(",", _carriedMonsterHexes)}";
 	}
 
 	private void CarryResolvedMonsterHexes()
@@ -210,6 +267,21 @@ internal sealed class HextechMayhemActState
 		for (int actIndex = 0; actIndex < _monsterHexByAct.Length; actIndex++)
 		{
 			int rawHex = _monsterHexByAct[actIndex];
+			if (rawHex < 0 || !IsResolved(actIndex) || !Enum.IsDefined(typeof(MonsterHexKind), rawHex))
+			{
+				continue;
+			}
+
+			MonsterHexKind hex = (MonsterHexKind)rawHex;
+			if (seen.Add(hex))
+			{
+				_carriedMonsterHexes.Add(hex);
+			}
+		}
+
+		for (int actIndex = 0; actIndex < _monsterHexByAct2.Length; actIndex++)
+		{
+			int rawHex = _monsterHexByAct2[actIndex];
 			if (rawHex < 0 || !IsResolved(actIndex) || !Enum.IsDefined(typeof(MonsterHexKind), rawHex))
 			{
 				continue;
