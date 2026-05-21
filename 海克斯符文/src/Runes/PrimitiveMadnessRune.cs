@@ -29,7 +29,6 @@ public sealed class PrimitiveMadnessRune : HextechRelicBase
 
 	protected override IEnumerable<IHoverTip> ExtraHoverTips =>
 	[
-		HoverTipFactory.FromCard<RollingBoulder>(),
 		HoverTipFactory.FromCard<GiantRock>()
 	];
 
@@ -39,9 +38,6 @@ public sealed class PrimitiveMadnessRune : HextechRelicBase
 		{
 			return;
 		}
-
-		Flash();
-		await AddCardCopiesToDeckOrHand<RollingBoulder>(1);
 
 		List<CardModel> attackCards = Owner.Deck.Cards
 			.Where(static card => card.Type == CardType.Attack && card.IsTransformable)
@@ -61,11 +57,14 @@ public sealed class PrimitiveMadnessRune : HextechRelicBase
 			card => card.Type == CardType.Attack && card.IsTransformable);
 
 		List<CardTransformation> transformations = selected
-			.Select(card => new CardTransformation(card, Owner.RunState.CreateCard<GiantRock>(Owner)))
+			.Select(card => CardTransformUpgradeHelper.CreateFixedReplacementTransformation(
+				card,
+				Owner.RunState.CreateCard<GiantRock>(Owner)))
 			.ToList();
 		if (transformations.Count > 0)
 		{
-			await CardCmd.Transform(transformations, Owner.RunState.Rng.CombatCardSelection, CardPreviewStyle.GridLayout);
+			Flash();
+			await CardCmd.Transform(transformations, null, CardPreviewStyle.GridLayout);
 		}
 	}
 }

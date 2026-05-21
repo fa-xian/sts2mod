@@ -77,7 +77,7 @@ internal sealed partial class HextechRuneSelectionScreen : Control, IOverlayScre
 		};
 		ApplyDefaultMegaLabelTheme(title);
 		title.Modulate = new Color(0.96f, 0.97f, 0.99f, 0.98f);
-		title.SetTextAutoSize(new LocString(LocTable, "HEXTECH_SELECTION_TITLE").GetRawText());
+		title.SetTextAutoSize(_titleOverride ?? new LocString(LocTable, "HEXTECH_SELECTION_TITLE").GetRawText());
 		root.AddChild(title);
 
 		if (_monsterHexRelic != null || _enemyHexControlsEnabled)
@@ -264,15 +264,14 @@ internal sealed partial class HextechRuneSelectionScreen : Control, IOverlayScre
 		}
 
 		MegaRichTextLabel body = CreateDescriptionLabel();
-		body.MaxFontSize = 17;
-		body.MinFontSize = 13;
+		body.CustomMinimumSize = new Vector2(0f, 48f);
 		if (_monsterHexKind.HasValue && !_enemyHexRemoved)
 		{
-			body.SetTextAutoSize(MonsterHexCatalog.GetEnemyHexDescriptionFormatted(_monsterHexKind.Value));
+			SetFixedDescriptionText(body, MonsterHexCatalog.GetEnemyHexDescriptionFormatted(_monsterHexKind.Value), 16);
 		}
 		else
 		{
-			body.SetTextAutoSize(new LocString(LocTable, "HEXTECH_ENEMY_REMOVED_DESCRIPTION").GetRawText());
+			SetFixedDescriptionText(body, new LocString(LocTable, "HEXTECH_ENEMY_REMOVED_DESCRIPTION").GetRawText(), 16);
 		}
 		textColumn.AddChild(body);
 
@@ -423,7 +422,7 @@ internal sealed partial class HextechRuneSelectionScreen : Control, IOverlayScre
 		{
 			MouseFilter = MouseFilterEnum.Ignore
 		};
-		pillCenter.AddChild(CreateRarityPill());
+		pillCenter.AddChild(CreatePlayerPoolPill(relic));
 		content.AddChild(pillCenter);
 
 		MegaRichTextLabel body = CreateDescriptionLabel();
@@ -514,7 +513,30 @@ internal sealed partial class HextechRuneSelectionScreen : Control, IOverlayScre
 		return body;
 	}
 
+	private static void SetFixedDescriptionText(MegaRichTextLabel label, string text, int fontSize)
+	{
+		label.MinFontSize = fontSize;
+		label.MaxFontSize = fontSize;
+		label.AddThemeFontSizeOverride("normal_font_size", fontSize);
+		label.AddThemeFontSizeOverride("bold_font_size", fontSize);
+		label.AddThemeFontSizeOverride("italics_font_size", fontSize);
+		label.AddThemeFontSizeOverride("bold_italics_font_size", fontSize);
+		label.AddThemeFontSizeOverride("mono_font_size", fontSize);
+		label.Text = text;
+	}
+
 	private Control CreateRarityPill()
+	{
+		return CreateTextPill(new LocString(LocTable, "HEXTECH_SERIES." + _rarityKey).GetRawText());
+	}
+
+	private Control CreatePlayerPoolPill(RelicModel relic)
+	{
+		string poolKey = HextechCatalog.GetPlayerRunePoolKey(relic);
+		return CreateTextPill(new LocString(LocTable, "HEXTECH_POOL." + poolKey).GetRawText());
+	}
+
+	private Control CreateTextPill(string text)
 	{
 		PanelContainer pill = new()
 		{
@@ -525,7 +547,7 @@ internal sealed partial class HextechRuneSelectionScreen : Control, IOverlayScre
 		Label label = new()
 		{
 			MouseFilter = MouseFilterEnum.Ignore,
-			Text = new LocString(LocTable, "HEXTECH_SERIES." + _rarityKey).GetRawText(),
+			Text = text,
 			HorizontalAlignment = HorizontalAlignment.Center
 		};
 		label.AddThemeColorOverride("font_color", new Color(0.08f, 0.09f, 0.11f, 0.92f));

@@ -23,6 +23,8 @@ internal sealed partial class HextechMayhemModifier
 	private int _cachedActiveMonsterHexActIndex = int.MinValue;
 	private bool _cachedActiveMonsterHexCombatRecovery;
 	private int _hexCountRecoveryBaseline;
+	private int _monsterHexStrengthTierFloor;
+	private bool _hostUsesBetterMultiplayerScaling;
 
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
 	public int[] SavedRarityByAct
@@ -101,10 +103,24 @@ internal sealed partial class HextechMayhemModifier
 	}
 
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+	public int SavedMonsterHexStrengthTierFloor
+	{
+		get => _monsterHexStrengthTierFloor;
+		set => _monsterHexStrengthTierFloor = Math.Clamp(value, 0, 3);
+	}
+
+	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
 	public string SavedCombatTrackingJson
 	{
 		get => _combatTracking.Serialize();
 		set => _combatTracking.Restore(value);
+	}
+
+	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+	public bool SavedHextechHostUsesBetterMultiplayerScaling
+	{
+		get => _hostUsesBetterMultiplayerScaling;
+		set => _hostUsesBetterMultiplayerScaling = value;
 	}
 
 	public override LocString Title => new("modifiers", "HEXTECH_MAYHEM.title");
@@ -118,6 +134,12 @@ internal sealed partial class HextechMayhemModifier
 	public RunState ActiveRunState => RunState;
 
 	internal HextechMayhemCombatTrackingState CombatTracking => _combatTracking;
+
+	internal bool HostUsesBetterMultiplayerScaling
+	{
+		get => _hostUsesBetterMultiplayerScaling;
+		set => _hostUsesBetterMultiplayerScaling = value;
+	}
 
 	public bool IsActResolved(int actIndex)
 	{
@@ -235,6 +257,7 @@ internal sealed partial class HextechMayhemModifier
 	public void ResetForNewRun()
 	{
 		_hexCountRecoveryBaseline = 0;
+		_monsterHexStrengthTierFloor = 0;
 		_actState.Reset();
 		_choiceHistory.Reset();
 		ResetCombatTracking();
@@ -244,16 +267,19 @@ internal sealed partial class HextechMayhemModifier
 	public void ResetForEndlessLoop(string reason)
 	{
 		_hexCountRecoveryBaseline = GetMinimumPlayerHexCount();
+		_monsterHexStrengthTierFloor = 3;
 		_actState.ResetForEndlessLoop();
 		_choiceHistory.Reset();
 		ResetCombatTracking();
 		InvalidateActiveMonsterHexCache();
-		Log.Info($"[{ModInfo.Id}][Mayhem] Reset for endless loop: reason={reason} baseline={_hexCountRecoveryBaseline} counts={DescribePlayerHexCounts()} {_actState.Describe()}");
+		Log.Info($"[{ModInfo.Id}][Mayhem] Reset for endless loop: reason={reason} baseline={_hexCountRecoveryBaseline} strengthTierFloor={_monsterHexStrengthTierFloor} counts={DescribePlayerHexCounts()} {_actState.Describe()}");
+		HextechRunLifecycleHooks.HandleEndlessLoopReset(this, reason);
 	}
 
 	public void DebugSetOnlyMonsterHex(int actIndex, MonsterHexKind hex, HextechRarityTier rarity)
 	{
 		_hexCountRecoveryBaseline = 0;
+		_monsterHexStrengthTierFloor = 0;
 		_actState.DebugSetOnlyMonsterHex(actIndex, hex, rarity);
 		_choiceHistory.Reset();
 
@@ -265,6 +291,14 @@ internal sealed partial class HextechMayhemModifier
 	{
 		EnsureActiveMonsterHexCache();
 		return _cachedActiveMonsterHexSet!.Contains(hex);
+	}
+
+	public int GetMonsterHexStrengthTier(MonsterHexKind hex)
+	{
+		_ = hex;
+		// Enemy hex strength tracks the current act, even for hexes obtained in earlier acts.
+		int actStrengthTier = Math.Clamp(RunState.CurrentActIndex + 1, 1, 3);
+		return Math.Max(actStrengthTier, _monsterHexStrengthTierFloor);
 	}
 
 	private void EnsureActiveMonsterHexCache()

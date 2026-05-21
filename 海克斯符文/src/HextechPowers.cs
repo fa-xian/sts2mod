@@ -13,29 +13,39 @@ namespace HextechRunes;
 
 public sealed class HextechBurnPower : PowerModel
 {
-	private static int _damageResolveDepth;
+	private const decimal StackDecayPercent = 0.1m;
+	private static int _resolveDepth;
 
-	internal static bool IsResolvingDamage => _damageResolveDepth > 0;
+	internal static bool IsResolvingDamage => _resolveDepth > 0;
 
 	public override PowerType Type => PowerType.Debuff;
 
 	public override PowerStackType StackType => PowerStackType.Counter;
 
-	public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+	public override async Task AfterSideTurnStart(CombatSide side, HextechCombatState combatState)
 	{
-		if (side != CombatSide.Player || Amount <= 0 || !Owner.IsAlive)
+		if (side != Owner.Side || Amount <= 0 || !Owner.IsAlive)
 		{
 			return;
 		}
 
+		int stacks = Amount;
+		int hpLoss = Math.Max(1, (int)Math.Floor(Owner.CurrentHp * stacks / 100m));
+		int stackLoss = Math.Max(1, (int)Math.Ceiling(stacks * StackDecayPercent));
+		Flash();
 		try
 		{
-			_damageResolveDepth++;
-			await CreatureCmd.Damage(choiceContext, Owner, Amount, ValueProp.Unpowered, Applier, null);
+			_resolveDepth++;
+			await CreatureCmd.SetCurrentHp(Owner, Math.Max(0, Owner.CurrentHp - hpLoss));
 		}
 		finally
 		{
-			_damageResolveDepth--;
+			_resolveDepth--;
+		}
+
+		if (Owner.IsAlive)
+		{
+			await PowerCmd.Apply<HextechBurnPower>(Owner, -stackLoss, null, null);
 		}
 	}
 }
@@ -95,15 +105,12 @@ public sealed class HextechPowerShieldTemporaryStrengthPower : TemporaryStrength
 
 public sealed class HextechAttackReplayPower : PowerModel
 {
-	private bool _triggeredLastPlay;
-
 	public override PowerType Type => PowerType.Buff;
 
 	public override PowerStackType StackType => PowerStackType.Counter;
 
 	public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
 	{
-		_triggeredLastPlay = false;
 		if (Amount <= 0m
 			|| card.Owner?.Creature != Owner
 			|| card.Type != CardType.Attack)
@@ -111,18 +118,18 @@ public sealed class HextechAttackReplayPower : PowerModel
 			return playCount;
 		}
 
-		_triggeredLastPlay = true;
 		return playCount + Amount;
 	}
 
 	public override async Task AfterModifyingCardPlayCount(CardModel card)
 	{
-		if (!_triggeredLastPlay || card.Owner?.Creature != Owner || card.Type != CardType.Attack)
+		if (Amount <= 0m
+			|| card.Owner?.Creature != Owner
+			|| card.Type != CardType.Attack)
 		{
 			return;
 		}
 
-		_triggeredLastPlay = false;
 		Flash();
 		await PowerCmd.Remove(this);
 	}
