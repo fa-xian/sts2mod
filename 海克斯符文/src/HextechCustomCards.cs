@@ -1,7 +1,10 @@
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
@@ -31,20 +34,14 @@ public sealed class ElicitCard : CardModel
 		HoverTipFactory.Static(StaticHoverTip.Evoke)
 	];
 
-	protected override IEnumerable<DynamicVar> CanonicalVars =>
-	[
-		new CardsVar(0)
-	];
-
 	public override IEnumerable<CardKeyword> CanonicalKeywords =>
 	[
-		CardKeyword.Innate,
 		CardKeyword.Retain,
 		CardKeyword.Exhaust
 	];
 
 	public ElicitCard()
-		: base(0, CardType.Skill, CardRarity.Token, TargetType.Self, shouldShowInCardLibrary: true)
+		: base(1, CardType.Skill, CardRarity.Token, TargetType.Self, shouldShowInCardLibrary: true)
 	{
 	}
 
@@ -55,16 +52,11 @@ public sealed class ElicitCard : CardModel
 		{
 			await OrbCmd.EvokeNext(choiceContext, Owner);
 		}
-
-		if (DynamicVars.Cards.IntValue > 0)
-		{
-			await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.BaseValue, Owner, fromHandDraw: false);
-		}
 	}
 
 	protected override void OnUpgrade()
 	{
-		DynamicVars.Cards.UpgradeValueBy(2m);
+		RemoveKeyword(CardKeyword.Exhaust);
 	}
 }
 
