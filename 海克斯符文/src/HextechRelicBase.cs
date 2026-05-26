@@ -40,6 +40,48 @@ public abstract class HextechRelicBase : RelicModel
 	private HextechCombatState? _turnScopedCombatState;
 	private int _turnScopedRoundNumber = -1;
 
+#if STS2_106_OR_NEWER
+	public virtual Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, HextechCombatState combatState)
+	{
+		return Task.CompletedTask;
+	}
+
+	public sealed override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, HextechCombatState combatState)
+	{
+		return BeforeSideTurnStart(choiceContext, side, combatState);
+	}
+
+	public virtual Task AfterSideTurnStart(CombatSide side, HextechCombatState combatState)
+	{
+		return Task.CompletedTask;
+	}
+
+	public sealed override Task AfterSideTurnStart(CombatSide side, IReadOnlyList<Creature> participants, HextechCombatState combatState)
+	{
+		return AfterSideTurnStart(side, combatState);
+	}
+
+	public virtual Task BeforeTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+	{
+		return Task.CompletedTask;
+	}
+
+	public sealed override Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
+	{
+		return BeforeTurnEnd(choiceContext, side);
+	}
+
+	public virtual Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+	{
+		return Task.CompletedTask;
+	}
+
+	public sealed override Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
+	{
+		return AfterTurnEnd(choiceContext, side);
+	}
+#endif
+
 	public sealed override RelicRarity Rarity => RelicRarity.Starter;
 
 	public override string PackedIconPath => GetResolvedIconPath();
@@ -113,6 +155,16 @@ public abstract class HextechRelicBase : RelicModel
 		return IsNetworkMultiplayerRun();
 	}
 
+	protected int GetPlayerActNumberForScaling()
+	{
+		if (Owner?.RunState.Modifiers.OfType<HextechMayhemModifier>().LastOrDefault()?.IsEndlessLoopActive == true)
+		{
+			return 3;
+		}
+
+		return Math.Clamp((Owner?.RunState.CurrentActIndex ?? 0) + 1, 1, 3);
+	}
+
 	protected bool ShouldUseNetworkCombatHistory()
 	{
 		return IsNetworkMultiplayer()
@@ -175,7 +227,20 @@ public abstract class HextechRelicBase : RelicModel
 			return true;
 		}
 
-		return cardSource?.Owner == Owner;
+		if (dealer?.Side == CombatSide.Player)
+		{
+			return false;
+		}
+
+		Player? cardOwner = cardSource?.Owner;
+		if (cardOwner == null)
+		{
+			return false;
+		}
+
+		return IsNetworkMultiplayer()
+			? cardOwner.NetId == Owner.NetId
+			: cardOwner == Owner;
 	}
 
 	protected bool IsDefectPlayer(Player player)

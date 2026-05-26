@@ -135,6 +135,8 @@ internal sealed partial class HextechMayhemModifier
 
 	internal HextechMayhemCombatTrackingState CombatTracking => _combatTracking;
 
+	internal bool IsEndlessLoopActive => _monsterHexStrengthTierFloor >= 3;
+
 	internal bool HostUsesBetterMultiplayerScaling
 	{
 		get => _hostUsesBetterMultiplayerScaling;

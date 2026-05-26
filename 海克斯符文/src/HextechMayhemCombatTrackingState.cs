@@ -20,6 +20,7 @@ internal sealed partial class HextechMayhemCombatTrackingState
 	public readonly HashSet<uint> DawnTriggered = new();
 	public readonly HashSet<uint> NearDeathFeastTriggered = new();
 	public readonly HashSet<uint> SpeedDemonPending = new();
+	public readonly Dictionary<uint, int> DelayedEnemyHealingBlock = new();
 	public readonly HashSet<uint> DevilsDanceTriggeredThisTurn = new();
 	public readonly HashSet<uint> FinalFormTriggeredThisTurn = new();
 	public readonly HashSet<uint> FeelTheBurnTriggered = new();
@@ -37,6 +38,7 @@ internal sealed partial class HextechMayhemCombatTrackingState
 	public readonly HashSet<uint> DoormakerRealStartApplied = new();
 	public readonly Dictionary<uint, int> TestSubjectPhaseStartApplied = new();
 	public readonly Dictionary<uint, int> TankEngineStacks = new();
+	public readonly Dictionary<uint, int> TankEngineLastAppliedRound = new();
 	public readonly Dictionary<uint, int> ShrinkEngineStacks = new();
 	public readonly Dictionary<uint, int> GetExcitedPending = new();
 	public readonly HashSet<uint> FeelTheBurnPending = new();
@@ -46,6 +48,7 @@ internal sealed partial class HextechMayhemCombatTrackingState
 	public readonly Dictionary<ulong, int> PlayerCardsDrawnThisCombat = new();
 	public readonly HashSet<ulong> VakuuControlledPlayersThisCombat = new();
 	public readonly HashSet<ulong> EightPennyGatePlayersTriggeredThisTurn = new();
+	public readonly HashSet<ulong> EightPennyGatePlayersTriggeredSecondThisTurn = new();
 	[CombatTrackingTransient]
 	public readonly HashSet<string> MonsterDebuffActionProcKeysThisTurn = new();
 	[CombatTrackingTransient]
@@ -67,12 +70,14 @@ internal sealed partial class HextechMayhemCombatTrackingState
 		BloodArmorHpLossThisPlayerTurn.Clear();
 		ClownCollegeProcsThisTurn.Clear();
 		EightPennyGatePlayersTriggeredThisTurn.Clear();
+		EightPennyGatePlayersTriggeredSecondThisTurn.Clear();
 	}
 
 	public void PreparePlayerSideTurnEnd()
 	{
 		PlayerAttackCardsPlayedThisTurn.Clear();
 		EightPennyGatePlayersTriggeredThisTurn.Clear();
+		EightPennyGatePlayersTriggeredSecondThisTurn.Clear();
 	}
 
 	public void PrepareEnemySideTurnStart()
