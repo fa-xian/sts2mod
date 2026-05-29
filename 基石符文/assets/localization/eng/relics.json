@@ -14,10 +14,10 @@
   "keystoneFirstStrikeRune.flavor": "The opening blow should already be profitable.",
 
   "KEYSTONE_UNDYING_GRASP_RUNE.title": "Grasp of the Undying",
-  "KEYSTONE_UNDYING_GRASP_RUNE.description": "Every [blue]{CardsPerCharge}[/blue] Attack cards played charges [gold]Grasp[/gold]. The next Attack that deals damage deals bonus damage equal to [blue]{BonusDamagePercent}%[/blue] of your max HP, then heals you for [blue]{HealPercent}%[/blue] of your max HP. The first time this triggers each combat, gain [blue]{MaxHpGain}[/blue] max HP.",
+  "KEYSTONE_UNDYING_GRASP_RUNE.description": "Every [blue]{CardsPerCharge}[/blue] Attack cards played charges [gold]Grasp[/gold]. The next Attack that deals damage deals bonus damage equal to [blue]{BonusDamagePercent}%[/blue] of your max HP, then heals you for [blue]{HealPercent}%[/blue] of your max HP. The first time this triggers each turn, gain [blue]{MaxHpGain}[/blue] max HP.",
   "KEYSTONE_UNDYING_GRASP_RUNE.flavor": "Slow, heavy, and never empty-handed.",
   "keystoneUndyingGraspRune.title": "Grasp of the Undying",
-  "keystoneUndyingGraspRune.description": "Every [blue]{CardsPerCharge}[/blue] Attack cards played charges [gold]Grasp[/gold]. The next Attack that deals damage deals bonus damage equal to [blue]{BonusDamagePercent}%[/blue] of your max HP, then heals you for [blue]{HealPercent}%[/blue] of your max HP. The first time this triggers each combat, gain [blue]{MaxHpGain}[/blue] max HP.",
+  "keystoneUndyingGraspRune.description": "Every [blue]{CardsPerCharge}[/blue] Attack cards played charges [gold]Grasp[/gold]. The next Attack that deals damage deals bonus damage equal to [blue]{BonusDamagePercent}%[/blue] of your max HP, then heals you for [blue]{HealPercent}%[/blue] of your max HP. The first time this triggers each turn, gain [blue]{MaxHpGain}[/blue] max HP.",
   "keystoneUndyingGraspRune.flavor": "Slow, heavy, and never empty-handed.",
 
   "KEYSTONE_CONQUEROR_RUNE.title": "Conqueror",
@@ -49,10 +49,10 @@
   "keystonePhaseRushRune.flavor": "Once the rhythm catches, the rest comes for free.",
 
   "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.title": "Unsealed Spellbook",
-  "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.description": "At the start of each combat, choose [blue]1[/blue] of [blue]{Options}[/blue] temporary random Power cards and add it to your hand. It can be played for free this combat.",
+  "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.description": "At the start of your turn, create [blue]1[/blue] random temporary Power card, make it cost [blue]0[/blue] this combat, and add it to your discard pile.",
   "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.flavor": "The hard part is not finding answers. It is choosing which page to open first.",
   "keystoneUnsealedSpellbookRune.title": "Unsealed Spellbook",
-  "keystoneUnsealedSpellbookRune.description": "At the start of each combat, choose [blue]1[/blue] of [blue]{Options}[/blue] temporary random Power cards and add it to your hand. It can be played for free this combat.",
+  "keystoneUnsealedSpellbookRune.description": "At the start of your turn, create [blue]1[/blue] random temporary Power card, make it cost [blue]0[/blue] this combat, and add it to your discard pile.",
   "keystoneUnsealedSpellbookRune.flavor": "The hard part is not finding answers. It is choosing which page to open first.",
 
   "KEYSTONE_HAIL_OF_BLADES_RUNE.title": "Hail of Blades",
@@ -91,10 +91,10 @@
   "keystoneAftershockRune.flavor": "Stone answers only after the blow lands.",
 
   "KEYSTONE_GUARDIAN_RUNE.title": "Guardian",
-  "KEYSTONE_GUARDIAN_RUNE.description": "The first time each turn you gain Block from a card, other players gain the same amount of Block. If there are no other players, you gain that much Block again instead.",
+  "KEYSTONE_GUARDIAN_RUNE.description": "The first time each turn you gain Block from a card, other players gain the same amount of Block and you gain that much Gold. If there are no other players, you gain that much Block again instead.",
   "KEYSTONE_GUARDIAN_RUNE.flavor": "A shield is a promise made visible.",
   "keystoneGuardianRune.title": "Guardian",
-  "keystoneGuardianRune.description": "The first time each turn you gain Block from a card, other players gain the same amount of Block. If there are no other players, you gain that much Block again instead.",
+  "keystoneGuardianRune.description": "The first time each turn you gain Block from a card, other players gain the same amount of Block and you gain that much Gold. If there are no other players, you gain that much Block again instead.",
   "keystoneGuardianRune.flavor": "A shield is a promise made visible.",
 
   "KEYSTONE_DARK_HARVEST_RUNE.title": "Dark Harvest",

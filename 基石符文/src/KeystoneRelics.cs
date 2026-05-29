@@ -366,7 +366,7 @@ public sealed class Keystone_UndyingGraspRune : Keystone_RelicBase
 
 	private CardModel? _lastTriggeredCard;
 
-	private bool _hasGainedMaxHpThisCombat;
+	private bool _hasGainedMaxHpThisTurn;
 
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
 	public int SavedCardsPlayedTowardCharge
@@ -387,10 +387,10 @@ public sealed class Keystone_UndyingGraspRune : Keystone_RelicBase
 	}
 
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
-	public bool SavedHasGainedMaxHpThisCombat
+	public bool SavedHasGainedMaxHpThisTurn
 	{
-		get => _hasGainedMaxHpThisCombat;
-		set => _hasGainedMaxHpThisCombat = value;
+		get => _hasGainedMaxHpThisTurn;
+		set => _hasGainedMaxHpThisTurn = value;
 	}
 
 	protected override IEnumerable<DynamicVar> CanonicalVars =>
@@ -427,6 +427,16 @@ public sealed class Keystone_UndyingGraspRune : Keystone_RelicBase
 	public override Task AfterCombatEnd(CombatRoom room)
 	{
 		ResetTracking();
+		return Task.CompletedTask;
+	}
+
+	public override Task AfterSideTurnStart(CombatSide side, TurnCombatState combatState)
+	{
+		if (side == CombatSide.Player)
+		{
+			_hasGainedMaxHpThisTurn = false;
+		}
+
 		return Task.CompletedTask;
 	}
 
@@ -487,9 +497,9 @@ public sealed class Keystone_UndyingGraspRune : Keystone_RelicBase
 		int healAmount = Math.Max(1, RoundToInt((decimal)owner.Creature.MaxHp * HealRatio));
 		Flash([target]);
 
-		if (!_hasGainedMaxHpThisCombat)
+		if (!_hasGainedMaxHpThisTurn)
 		{
-			_hasGainedMaxHpThisCombat = true;
+			_hasGainedMaxHpThisTurn = true;
 			await CreatureCmd.GainMaxHp(owner.Creature, FirstTriggerMaxHpGain);
 		}
 
@@ -512,7 +522,6 @@ public sealed class Keystone_UndyingGraspRune : Keystone_RelicBase
 		_cardsPlayedTowardCharge = 0;
 		_charges = 0;
 		_lastTriggeredCard = null;
-		_hasGainedMaxHpThisCombat = false;
 		RefreshVisualState();
 	}
 
@@ -1045,39 +1054,29 @@ public sealed class Keystone_UnsealedSpellbookRune : Keystone_RelicBase
 
 	protected override string GetIconPath() => ModInfo.UnsealedSpellbookIconPath;
 
-	public override async Task BeforeCombatStart()
+	public override async Task AfterSideTurnStart(CombatSide side, TurnCombatState combatState)
 	{
-		if (Owner == null)
+		if (side != CombatSide.Player || Owner == null)
 		{
 			return;
 		}
 
-		List<CardModel> options = BuildSpellbookOptions();
-		if (options.Count == 0)
+		CardModel? card = RandomOnePowerCard();
+		if (card == null)
 		{
 			return;
 		}
 
-		CardModel? selectedCard = await CardSelectCmd.FromChooseACardScreen(
-			new BlockingPlayerChoiceContext(),
-			options,
-			Owner,
-			canSkip: false);
-		if (selectedCard == null)
-		{
-			return;
-		}
-
+		card.SetToFreeThisCombat();
 		Flash(Array.Empty<Creature>());
-		selectedCard.SetToFreeThisCombat();
-		await Sts2Compat.AddGeneratedCardToCombat(selectedCard, PileType.Hand, Owner!, CardPilePosition.Bottom);
+		await Sts2Compat.AddGeneratedCardToCombat(card, PileType.Discard, Owner!, CardPilePosition.Bottom);
 	}
 
-	private List<CardModel> BuildSpellbookOptions()
+	private CardModel? RandomOnePowerCard()
 	{
 		if (Owner == null)
 		{
-			return new List<CardModel>();
+			return null;
 		}
 
 		return CardFactory.GetDistinctForCombat(
@@ -1085,9 +1084,9 @@ public sealed class Keystone_UnsealedSpellbookRune : Keystone_RelicBase
 				from c in Owner.Character.CardPool.GetUnlockedCards(Owner.UnlockState, Owner.RunState.CardMultiplayerConstraint)
 				where c.Type == CardType.Power
 				select c,
-				3,
+				1,
 				Owner.RunState.Rng.CombatCardGeneration)
-			.ToList();
+			.FirstOrDefault();
 	}
 }
 
@@ -1642,6 +1641,19 @@ public sealed class Keystone_GuardianRune : Keystone_RelicBase
 
 	private bool _isGrantingGuardianBlock;
 
+	private int _totalGuardianBlock;
+
+	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+	public int SavedTotalGuardianBlock
+	{
+		get => _totalGuardianBlock;
+		set
+		{
+			_totalGuardianBlock = Math.Max(0, value);
+			InvokeDisplayAmountChanged();
+		}
+	}
+
 	[SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
 	public bool SavedTriggeredThisTurn
 	{
@@ -1655,8 +1667,13 @@ public sealed class Keystone_GuardianRune : Keystone_RelicBase
 
 	protected override string GetIconPath() => ModInfo.GuardianIconPath;
 
+	public override bool ShowCounter => !IsCanonical;
+
+	public override int DisplayAmount => !IsCanonical ? _totalGuardianBlock : 0;
+
 	public override Task BeforeCombatStart()
 	{
+		_totalGuardianBlock = 0;
 		ResetTracking();
 		return Task.CompletedTask;
 	}
@@ -1693,6 +1710,7 @@ public sealed class Keystone_GuardianRune : Keystone_RelicBase
 		}
 
 		_triggeredThisTurn = true;
+		_totalGuardianBlock += (int)amount;
 		RefreshVisualState();
 
 		List<Creature> teammates = ownerCreature.CombatState
@@ -1721,6 +1739,19 @@ public sealed class Keystone_GuardianRune : Keystone_RelicBase
 		{
 			_isGrantingGuardianBlock = false;
 		}
+	}
+
+	public override Task AfterCombatVictory(CombatRoom room)
+	{
+		if (Owner != null && _totalGuardianBlock > 0)
+		{
+			room.AddExtraReward(Owner, new GoldReward(_totalGuardianBlock, Owner));
+			Flash(Array.Empty<Creature>());
+			_totalGuardianBlock = 0;
+			InvokeDisplayAmountChanged();
+		}
+
+		return Task.CompletedTask;
 	}
 
 	private void ResetTracking()

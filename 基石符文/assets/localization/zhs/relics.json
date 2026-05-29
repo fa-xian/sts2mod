@@ -14,10 +14,10 @@
   "keystoneFirstStrikeRune.flavor": "比影子更早抵达的那一下。",
 
   "KEYSTONE_UNDYING_GRASP_RUNE.title": "不灭之握",
-  "KEYSTONE_UNDYING_GRASP_RUNE.description": "每打出[blue]{CardsPerCharge}[/blue]张攻击牌，充能一次[gold]不灭[/gold]。充能后的下一张攻击牌会额外造成等同于自身最大生命值[blue]{BonusDamagePercent}%[/blue]的伤害，并回复等同于自身最大生命值[blue]{HealPercent}%[/blue]的生命。每场战斗首次触发时，获得[blue]{MaxHpGain}[/blue]点最大生命值。",
+  "KEYSTONE_UNDYING_GRASP_RUNE.description": "每打出[blue]{CardsPerCharge}[/blue]张攻击牌，充能一次[gold]不灭[/gold]。充能后的下一张攻击牌会额外造成等同于自身最大生命值[blue]{BonusDamagePercent}%[/blue]的伤害，并回复等同于自身最大生命值[blue]{HealPercent}%[/blue]的生命。每回合首次触发时，获得[blue]{MaxHpGain}[/blue]点最大生命值。",
   "KEYSTONE_UNDYING_GRASP_RUNE.flavor": "即便断了手腕，剑也不曾落下。",
   "keystoneUndyingGraspRune.title": "不灭之握",
-  "keystoneUndyingGraspRune.description": "每打出[blue]{CardsPerCharge}[/blue]张攻击牌，充能一次[gold]不灭[/gold]。充能后的下一张攻击牌会额外造成等同于自身最大生命值[blue]{BonusDamagePercent}%[/blue]的伤害，并回复等同于自身最大生命值[blue]{HealPercent}%[/blue]的生命。每场战斗首次触发时，获得[blue]{MaxHpGain}[/blue]点最大生命值。",
+  "keystoneUndyingGraspRune.description": "每打出[blue]{CardsPerCharge}[/blue]张攻击牌，充能一次[gold]不灭[/gold]。充能后的下一张攻击牌会额外造成等同于自身最大生命值[blue]{BonusDamagePercent}%[/blue]的伤害，并回复等同于自身最大生命值[blue]{HealPercent}%[/blue]的生命。每回合首次触发时，获得[blue]{MaxHpGain}[/blue]点最大生命值。",
   "keystoneUndyingGraspRune.flavor": "即便断了手腕，剑也不曾落下。",
 
   "KEYSTONE_CONQUEROR_RUNE.title": "征服者",
@@ -49,10 +49,10 @@
   "keystonePhaseRushRune.flavor": "刻在脚踝上的纹路，比念头更快。",
 
   "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.title": "启封的秘籍",
-  "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.description": "每场战斗开始时，从[blue]{Options}[/blue]张临时的随机能力牌中选择[blue]1[/blue]张加入手牌。它在本场战斗中可以免费打出。",
+  "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.description": "每回合开始时，随机生成[blue]1[/blue]张临时能力牌，它在本场战斗中费用为[blue]0[/blue]，放入弃牌堆。",
   "KEYSTONE_UNSEALED_SPELLBOOK_RUNE.flavor": "封蜡上的指痕，不属于任何人。",
   "keystoneUnsealedSpellbookRune.title": "启封的秘籍",
-  "keystoneUnsealedSpellbookRune.description": "每场战斗开始时，从[blue]{Options}[/blue]张临时的随机能力牌中选择[blue]1[/blue]张加入手牌。它在本场战斗中可以免费打出。",
+  "keystoneUnsealedSpellbookRune.description": "每回合开始时，随机生成[blue]1[/blue]张临时能力牌，它在本场战斗中费用为[blue]0[/blue]，放入弃牌堆。",
   "keystoneUnsealedSpellbookRune.flavor": "封蜡上的指痕，不属于任何人。",
 
   "KEYSTONE_HAIL_OF_BLADES_RUNE.title": "丛刃",
@@ -91,10 +91,10 @@
   "keystoneAftershockRune.flavor": "石壁不会先开口，但总会最后回响。",
 
   "KEYSTONE_GUARDIAN_RUNE.title": "守护者",
-  "KEYSTONE_GUARDIAN_RUNE.description": "每回合第一次从卡牌中获得格挡时，其他玩家也获得相同数值的格挡。如果没有其他玩家，则改为翻倍你这次获得的格挡。",
+  "KEYSTONE_GUARDIAN_RUNE.description": "每回合第一次从卡牌中获得格挡时，其他玩家也获得相同数值的格挡，并额外获得等量金币。如果没有其他玩家，则改为翻倍你这次获得的格挡。",
   "KEYSTONE_GUARDIAN_RUNE.flavor": "盾面朝向何处，便意味着谁值得活下去。",
   "keystoneGuardianRune.title": "守护者",
-  "keystoneGuardianRune.description": "每回合第一次从卡牌中获得格挡时，其他玩家也获得相同数值的格挡。如果没有其他玩家，则改为翻倍你这次获得的格挡。",
+  "keystoneGuardianRune.description": "每回合第一次从卡牌中获得格挡时，其他玩家也获得相同数值的格挡，并额外获得等量金币。如果没有其他玩家，则改为翻倍你这次获得的格挡。",
   "keystoneGuardianRune.flavor": "盾面朝向何处，便意味着谁值得活下去。",
 
   "KEYSTONE_DARK_HARVEST_RUNE.title": "黑暗收割",

@@ -1,0 +1,8 @@
+KeystoneRunes 基石符文 Mod 打包指令
+
+========================================
+项目路径: f:\sts2\sts2mod-main\KeystoneRunes
+游戏路径: E:\tim_d_laji\sts2\Slay the Spire 2
+Godot:    E:\Godot_v4.5.1-stable_mono_win64\Godot_v4.5.1-stable_mono_win64_console.exe
+.NET:     C:\Program Files\dotnet\dotnet.exe
+========================================
